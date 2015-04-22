@@ -1,0 +1,49 @@
+#######################################
+# Syntax Coloring Map ControlLCD 
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+C_D_LCD				KEYWORD1
+LCD					KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+LCDCommand 	  		KEYWORD2
+LCDData		  		KEYWORD2
+
+initDISPLAY	  		KEYWORD2
+
+setAddrWindow		KEYWORD2
+fillColor			KEYWORD2
+drawPixel			KEYWORD2
+drawLine			KEYWORD2
+setWidth			KEYWORD2
+setHeight			KEYWORD2
+getWidth			KEYWORD2
+getHeight			KEYWORD2
+RotSetting			KEYWORD2
+drawFastVLine		KEYWORD2
+drawFastHLine		KEYWORD2
+drawRect			KEYWORD2
+fillRect			KEYWORD2
+fillScreen			KEYWORD2
+lcdTest				KEYWORD2
+drawCircle			KEYWORD2
+drawCircleHelper	KEYWORD2
+fillCircleHelper	KEYWORD2
+fillCircle			KEYWORD2
+fillRoundRect		KEYWORD2
+toChar				KEYWORD2
+drawChar			KEYWORD2
+print				KEYWORD2
+printN				KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+x_start				LITERAL1
+y_start				LITERAL1
