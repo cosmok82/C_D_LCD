@@ -5,6 +5,9 @@ Fork of our previous TFTM1802 SPI Display Library for CY8CKIT-049-42xx, now port
 Alpha version, never tested.
 </br>
 </br>
+Topic on <a href="http://goo.gl/Y1xJHQ">esp8266.com</a> .
+</br>
+</br>
 
     0.0.1 (2015-04-22)
     ------------------
