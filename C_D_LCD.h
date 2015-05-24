@@ -30,6 +30,7 @@
 #ifndef _C_D_LCD_H_INCLUDED
 #define _C_D_LCD_H_INCLUDED
 
+#include <Arduino.h>
 #include <SPI.h>
 extern "C" {  //used "external C" to solve all compiling problems
 #include "glcdfont.h"
@@ -91,38 +92,39 @@ extern "C" {  //used "external C" to solve all compiling problems
 //*******************************************************
 //					16-Bit Color Definitions
 ////*****************************************************
-#define BLACK	    0x000000u
-#define NAVY        0x000080u
-#define BLUE        0x0000FCu
-#define TEAL        0x008080u
-#define EMERALD	    0x50C878u
-#define	GREEN       0x00FC00u
-#define CYAN        0x008888u
-#define SLATE 	    0u
-#define INDIGO      0u
-#define TURQUOISE   0u
-#define OLIVE 		0u
-#define MAROON 		0u
-#define PURPLE 		0u
-#define GRAY        0u
-#define SKYBLUE		0u
-#define BROWN		0u
-#define CRIMSON 	0u
-#define ORCHID 		0u
-#define RED         0xFC0000u
-#define MAGENTA     0xFC54A0u
-#define ORANGE 		0u
-#define PINK		0u
-#define CORAL 		0u
-#define SALMON 		0u
-#define GOLD 		0u
-#define YELLOW      0x00FCFCu
-#define WHITE       0xFCFCFCu
+#define BLACK	  0x000000u
+#define NAVY      0x000080u
+#define BLUE      0x0000FCu
+#define TEAL      0x008080u
+#define EMERALD	  0x50C878u
+#define GREEN     0x00FC00u
+#define CYAN      0x008888u
+#define SLATE 	  0u
+#define INDIGO    0u
+#define TURQUOISE 0u
+#define OLIVE 	  0u
+#define MAROON 	  0u
+#define PURPLE 	  0u
+#define GRAY      0u
+#define SKYBLUE	  0u
+#define BROWN	  0u
+#define CRIMSON   0u
+#define ORCHID 	  0u
+#define RED       0xFC0000u
+#define MAGENTA   0xFC54A0u
+#define ORANGE 	  0u
+#define PINK	  0u
+#define CORAL 	  0u
+#define SALMON 	  0u
+#define GOLD 	  0u
+#define YELLOW    0x00FCFCu
+#define WHITE     0xFCFCFCu
 
-//********************************************************************
-//					    Various Definitions
-////******************************************************************
-
+////////////////////////////////////////////////////////////////////////////////
+//
+// Various Definitions
+//				 
+////////////////////////////////////////////////////////////////////////////////
 #ifndef LOW
 #define LOW  0u
 #endif
@@ -130,68 +132,69 @@ extern "C" {  //used "external C" to solve all compiling problems
 #define HIGH 1u
 #endif
 
-//********************************************************************
-//					      Code Definitions
-////******************************************************************
-
-#define swap(a, b) { uint16 t = a; a = b; b = t; }
-
-//*******************************************************
+////////////////////////////////////////////////////////////////////////////////
+//
+// Code Definitions
+//				 
+////////////////////////////////////////////////////////////////////////////////
+#define swap(a, b) { uint16_t t = a; a = b; b = t; }
 
 class C_D_LCD { //only for ARDUINO ESP8266
-	public:
+public:
 	  
-	  // Initialize the SPI library
-	  C_D_LCD(void);
-	  // Disable the SPI bus
-	  /*~C_D_LCD(void);*/
+  // Initialize the C_D_LCD library
+  void begin(void),
+	   end(void);
 	  	  
-	  uint8 x_start, y_start;
+  uint8_t x_start, y_start;
+  
+  void LCDCommand(uint8_t datacmd),
+	   LCDData(uint8_t datadt),
 	  
-	  void LCDCommand(uint8 datacmd),
-		   LCDData(uint8 datadt),
-	  
-		   initDISPLAY(void),
+	   initDISPLAY(void),
 
-		   setAddrWindow(uint8 x0, uint8 y0, uint8 x1, uint8 y1),
-		   fillColor(uint32 color),
-		   drawPixel(uint16 x, uint16 y, uint32 color),
-		   drawLine(uint16 x0, uint16 y0, uint16 x1, uint16 y1, uint32 color),
-		   setWidth(uint8 d),
-		   setHeight(uint8 d),
-		   RotSetting(uint8 m),
-		   drawFastVLine(uint16 x, uint16 y, uint16 h, uint32 color),
-		   drawFastHLine(uint16 x, uint16 y, uint16 w, uint32 color),
-		   drawRect(uint16 x, uint16 y, uint16 w, uint16 h, uint32 color),
-		   fillRect(uint16 x, uint16 y, uint16 w, uint16 h, uint32 color),
-		   fillScreen(uint32 color),
-		   lcdTest(void),
-		   drawCircle(uint16 x0, uint16 y0, uint16 r, uint32 color),
-		   drawCircleHelper( uint16 x0, uint16 y0, uint16 r, uint8 cornername, uint32 color),
-		   fillCircleHelper(uint16 x0, uint16 y0, uint16 r, uint8 cornername, uint16 delta, uint32 color),
-		   fillCircle(uint16 x0, uint16 y0, uint16 r, uint32 color),
-		   fillRoundRect(uint16 x, uint16 y, uint16 w, uint16 h, uint16 r, uint32 color), 
-		   drawChar(uint16 x, uint16 y, unsigned char c, uint32 color, uint16 bg, uint8 size),
-		   print(char* text, uint32 color, uint16 bg, uint8 size),
-		   printN(char* text, uint32 color, uint16 bg, uint8 size, uint8 num);
-	  char* toChar(uint8 d);
-	  uint8 getWidth(void),
-			getHeight(void);
+	   setAddrWindow(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1),
+	   fillColor(uint32_t color),
+	   drawPixel(uint16_t x, uint16_t y, uint32_t color),
+	   drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint32_t color),
+	   setWidth(uint8_t d),
+	   setHeight(uint8_t d),
+	   RotSetting(uint8_t m),
+	   drawFastVLine(int16_t x, int16_t y, int16_t h, uint32_t color),
+	   drawFastHLine(int16_t x, int16_t y, int16_t w, uint32_t color),
+	   drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint32_t color),
+	   fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint32_t color),
+	   fillScreen(uint32_t color),
+	   lcdTest(void),
+	   drawCircle(int16_t x0, int16_t y0, int16_t r, uint32_t color),
+	   drawCircleHelper( int16_t x0, int16_t y0, int16_t r, uint8_t cornername, uint32_t color),
+	   fillCircleHelper(int16_t x0, int16_t y0, int16_t r, uint8_t cornername, int16_t delta, uint32_t color),
+	   fillCircle(int16_t x0, int16_t y0, int16_t r, uint32_t color),
+	   fillRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint32_t color),
+	   drawChar(int16_t x, int16_t y, unsigned char c, uint32_t color, uint16_t bg, uint8_t size),
+	   print(char* text, uint32_t color, uint16_t bg, uint8_t size),
+	   printN(char* text, uint32_t color, uint16_t bg, uint8_t size, uint8_t num);
+	
+ char* toChar(uint8_t d);
+ uint8_t getWidth(void),
+	     getHeight(void);
 	  
-	private:
-	  void initSPIM(void),
-		   ResetDispaly(void);
+private:
+	
+  void initSPIM(void),
+	   ResetDispaly(void);
+	
+	   #define TFT_RS_init()        pinMode(2, OUTPUT)
+       #define RS_Write(bit_value)  digitalWrite(2, bit_value)
+	   #define TFT_RST_init()       pinMode(16, OUTPUT)
+       #define RST_Write(bit_value) digitalWrite(16, bit_value)	
+  uint8_t _width,
+	      _height;
+  char character = ' ';
 	  
-	  inline static void CS_Write (uint32 bit_value) { gpio_output_set((uint32) bit_value<<4, ((uint32) (~bit_value)&0x01)<<4, (uint32) 1<<4,(uint32) 0); };
-	  inline static void RS_Write (uint32 bit_value) { gpio_output_set((uint32) bit_value<<2, ((uint32) (~bit_value)&0x01)<<2, (uint32) 1<<2,(uint32) 0); };
-	  inline static void RST_Write(uint32 bit_value) { gpio_output_set((uint32) bit_value,    ((uint32)    (~bit_value)&0x01), (uint32)    1,(uint32) 0); };
-	  inline static void TFT_CS_init(void)  { PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO4_U, FUNC_GPIO4); CS_Write(0); };
-	  inline static void TFT_RS_init(void)  { PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO2_U, FUNC_GPIO2); RS_Write(1); };
-	  inline static void TFT_RST_init(void) { PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO0_U, FUNC_GPIO0); RST_Write(0);};
-	  
-	  uint8 _width,
-			_height;
-	  char character = ' ';
 };
+
+
+extern C_D_LCD SPILCD;
 
 #endif // _C_D_LCD_H_INCLUDED

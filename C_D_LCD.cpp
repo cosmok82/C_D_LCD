@@ -31,30 +31,31 @@
 #include <SPI.h>
 #include <stdlib.h>
 #include <math.h>
-extern "C" {}
+extern "C" {
+	#include "c_types.h"
+	#include "osapi.h"
+}
+
+C_D_LCD SPILCD;
 
 
 
-/*
-#define CS_Write(x)		 GPIO_OUTPUT_SET(4, x)
-#define TFT_CS_INIT		 PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO4_U, FUNC_GPIO4); CS_Write(0)
-
-#define RS_Write(x)		 GPIO_OUTPUT_SET(2, x)
-#define TFT_RS_INIT 	 PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO2_U, FUNC_GPIO2); RS_Write(1)
-
-#define RST_Write(x)	 GPIO_OUTPUT_SET(0, x)
-#define TFT_RST_INIT	 PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO0_U, FUNC_GPIO0); RST_Write(0)
-*/
-
-/*******************************************************/
-void C_D_LCD::initSPIM(void)
+/* This function transmits a command to the LCD driver */
+void C_D_LCD::LCDCommand(uint8_t datacmd)
 {
-    TFT_CS_init();
-	TFT_RS_init();
-	TFT_RST_init();
-	SPI.begin(HSPI);
-	delay(100);
-};
+	RS_Write(LOW);
+	SPI.write(datacmd);
+	//SPI.spi_tx8(datacmd);
+}
+/*******************************************************/
+/* This function transmits a data to the LCD driver */
+void C_D_LCD::LCDData(uint8_t datadt)
+{
+	RS_Write(HIGH);
+	SPI.write(datadt);
+	//SPI.spi_tx8(datadt);
+}
+
 /*******************************************************/
 void C_D_LCD::ResetDispaly(void)
 {
@@ -65,35 +66,26 @@ void C_D_LCD::ResetDispaly(void)
 	RST_Write(HIGH);
 	delay(10);
 }
-
-C_D_LCD::C_D_LCD(void)
-{
-	_width  = 0;
-	_height = 0;
-	initSPIM();    // initialization of SPIM.
-	ResetDispaly();
-}
-
-/* This function transmits a command to the LCD driver */
-void C_D_LCD::LCDCommand(uint8 datacmd)
-{
-	RS_Write(LOW);
-	SPI.spi_tx8(datacmd);
-}
 /*******************************************************/
-
-/* This function transmits a data to the LCD driver */
-void C_D_LCD::LCDData(uint8 datadt)
+void C_D_LCD::initSPIM(void)
 {
-	RS_Write(HIGH);
-	SPI.spi_tx8(datadt);
-	
-}
+	TFT_RS_init();
+	TFT_RST_init();
+	SPI.begin();
+	SPI.setHwCs(1);
+	SPI.setFrequency(40000000);
+	SPI.setDataMode(SPI_MODE0);
+	SPI.setBitOrder(MSBFIRST);
+	delay(100);
+};
+
 /*******************************************************/
 void C_D_LCD::initDISPLAY(void)
 {
-    x_start = y_start = 0u;                         // May be overridden in init function.
-    
+    x_start = y_start = 0u;                         // May be overridden in begin function.
+    initSPIM();
+	ResetDispaly();
+	
     LCDCommand(0xF0);
     LCDData(0x5A); LCDData(0x5A);                   // Excommand2.
 	
@@ -167,23 +159,23 @@ void C_D_LCD::initDISPLAY(void)
     LCDData(0x00);	                                // Power sequence control.
 	
     LCDCommand(SLEEPOUT);
-    delay(50);                                    // Wake.
+    delay(50);                                      // Wake.
 	
     LCDCommand(0xF3);
     LCDData(0x00); LCDData(0x01);
-    delay(50);	                                // Power sequence control.
+    delay(50);	                                	// Power sequence control.
 	
     LCDCommand(0xF3);
     LCDData(0x00); LCDData(0x03);
-    delay(50);	                                // Power sequence control.
+    delay(50);	                                	// Power sequence control.
 	
     LCDCommand(0xF3);
     LCDData(0x00); LCDData(0x07);
-    delay(50);	                                // Power sequence control.
+    delay(50);	                                	// Power sequence control.
 	
     LCDCommand(0xF3);
     LCDData(0x00); LCDData(0x0F);
-    delay(50);	                                // Power sequence control.
+    delay(50);	                                	// Power sequence control.
 	
     LCDCommand(0xF4);
     LCDData(0x00); LCDData(0x04); LCDData(0x00);
@@ -191,19 +183,19 @@ void C_D_LCD::initDISPLAY(void)
     LCDData(0x3F); LCDData(0x07); LCDData(0x00);
     LCDData(0x3C); LCDData(0x36); LCDData(0x00);
     LCDData(0x3C); LCDData(0x36); LCDData(0x00);
-    delay(50);	                                // Power control.
+    delay(50);	                                	// Power control.
 	
     LCDCommand(0xF3);
     LCDData(0x00); LCDData(0x1F);
-    delay(50);	                                // Power sequence control.
+    delay(50);	                                	// Power sequence control.
 	
     LCDCommand(0xF3);
     LCDData(0x00); LCDData(0x7F);
-    delay(50);	                                // Power sequence control.
+    delay(50);	                                	// Power sequence control.
 	
     LCDCommand(0xF3);
     LCDData(0x00); LCDData(0xFF);
-    delay(50);	                                // Power sequence control.
+    delay(50);	                                	// Power sequence control.
     
     LCDCommand(0xFD);
     LCDData(0x00); LCDData(0x00); LCDData(0x00);
@@ -228,8 +220,14 @@ void C_D_LCD::initDISPLAY(void)
     _width  = WIDTH;
     _height = HEIGHT;
 }
+
+void C_D_LCD::begin(void)
+{
+	initDISPLAY();
+}
+
 /*******************************************************/
-void C_D_LCD::setAddrWindow(uint8 x0, uint8 y0, uint8 x1, uint8 y1)
+void C_D_LCD::setAddrWindow(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1)
 {
   LCDCommand(CASET);      // column addr set
   LCDData(NOP);  
@@ -245,13 +243,15 @@ void C_D_LCD::setAddrWindow(uint8 x0, uint8 y0, uint8 x1, uint8 y1)
   LCDCommand(RAMWR);      // write to RAM
 }
 /*******************************************************/
-void C_D_LCD::fillColor(uint32 color)
-{  
+void C_D_LCD::fillColor(uint32_t color)
+{ 
   RS_Write(HIGH);
-  SPI.spi_tx16(color);
+  SPI.write((uint8_t) color);
+  SPI.write((uint8_t)(color >> 8));
+  SPI.write((uint8_t)(color >> 16));
 }
 /*******************************************************/
-void C_D_LCD::drawPixel(uint16 x, uint16 y, uint32 color)
+void C_D_LCD::drawPixel(uint16_t x, uint16_t y, uint32_t color)
 {
   if((x < 0) || (x >= _width) || (y < 0) || (y >= _height)) return;
  
@@ -260,20 +260,20 @@ void C_D_LCD::drawPixel(uint16 x, uint16 y, uint32 color)
   fillColor(color);
 }
 /*******************************************************/
-void C_D_LCD::drawLine(uint16 x0, uint16 y0, uint16 x1, uint16 y1, uint32 color)
+void C_D_LCD::drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint32_t color)
 {
-  uint16 steep = abs(y1 - y0) > abs(x1 - x0);
+  int16_t steep = abs(y1 - y0) > abs(x1 - x0);
   
   if (steep) { swap(x0, y0); swap(x1, y1); }
 
   if (x0 > x1) { swap(x0, x1); swap(y0, y1); }
 
-  uint16 dx, dy;
+  int16_t dx, dy;
   dx = x1 - x0;
   dy = abs(y1 - y0);
 
-  uint16 err = dx / 2;
-  uint16 ystep;
+  int16_t err = dx / 2;
+  int16_t ystep;
 
   if (y0 < y1)
   {
@@ -300,7 +300,7 @@ void C_D_LCD::drawLine(uint16 x0, uint16 y0, uint16 x1, uint16 y1, uint32 color)
   }
 }
 /*******************************************************/
-void C_D_LCD::setWidth(uint8 d)
+void C_D_LCD::setWidth(uint8_t d)
 {
     if (d == 0) // if (d == NULL)
         _width = WIDTH;
@@ -308,7 +308,7 @@ void C_D_LCD::setWidth(uint8 d)
         _width = d;
 }
 /*******************************************************/
-void C_D_LCD::setHeight(uint8 d)
+void C_D_LCD::setHeight(uint8_t d)
 {
     if (d == 0) // if (d == NULL)
         _height = HEIGHT;
@@ -316,12 +316,12 @@ void C_D_LCD::setHeight(uint8 d)
         _height = d;
 }
 /*******************************************************/
-uint8 C_D_LCD::getWidth(void)
+uint8_t C_D_LCD::getWidth(void)
 {
     return _width;
 }
 /*******************************************************/
-uint8 C_D_LCD::getHeight(void)
+uint8_t C_D_LCD::getHeight(void)
 {
     return _height;
 }
@@ -337,10 +337,10 @@ uint8 C_D_LCD::getHeight(void)
 #define MADCTL_MH  0x04
 
 /* Set Display rotation. */
-void C_D_LCD::RotSetting(uint8 m)
+void C_D_LCD::RotSetting(uint8_t m)
 {
   LCDCommand(MADCTL);
-  uint8 rotation = m % 4; // can't be higher than 3
+  uint8_t rotation = m % 4; // can't be higher than 3
   switch (rotation)
   { 
     case 0: // portrait 0°
@@ -369,7 +369,7 @@ void C_D_LCD::RotSetting(uint8 m)
   }
 }
 /*******************************************************/
-void C_D_LCD::drawFastVLine(uint16 x, uint16 y, uint16 h, uint32 color)
+void C_D_LCD::drawFastVLine(int16_t x, int16_t y, int16_t h, uint32_t color)
 {  
   // Rudimentary clipping
   if((x < 0) || (x >= _width) || (y < 0) || (y >= _height)) return;
@@ -382,7 +382,7 @@ void C_D_LCD::drawFastVLine(uint16 x, uint16 y, uint16 h, uint32 color)
   }
 }
 /*******************************************************/
-void C_D_LCD::drawFastHLine(uint16 x, uint16 y, uint16 w, uint32 color)
+void C_D_LCD::drawFastHLine(int16_t x, int16_t y, int16_t w, uint32_t color)
 {
   // Rudimentary clipping
   if((x < 0) || (x >= _width) || (y < 0) || (y >= _height)) return;
@@ -394,7 +394,7 @@ void C_D_LCD::drawFastHLine(uint16 x, uint16 y, uint16 w, uint32 color)
   }
 }
 /*******************************************************/
-void C_D_LCD::drawRect(uint16 x, uint16 y, uint16 w, uint16 h, uint32 color)
+void C_D_LCD::drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint32_t color)
 {
   drawFastHLine(x, y, w, color);
   drawFastHLine(x, y+h-1, w, color);
@@ -402,37 +402,38 @@ void C_D_LCD::drawRect(uint16 x, uint16 y, uint16 w, uint16 h, uint32 color)
   drawFastVLine(x+w-1, y, h, color);
 }
 /*******************************************************/
-void C_D_LCD::fillRect(uint16 x, uint16 y, uint16 w, uint16 h, uint32 color)
+void C_D_LCD::fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint32_t color)
 {
-  uint16 i;
+  uint16_t i;
   for (i = x; i < x+w; i++) {
     drawFastVLine(i, y, h, color);
   }
 }
 /*******************************************************/
-void C_D_LCD::fillScreen(uint32 color)
+void C_D_LCD::fillScreen(uint32_t color)
 {
   fillRect(0, 0, _width, _height, color);
 }
 /*******************************************************/
 void C_D_LCD::lcdTest(void)
 {
-  uint8 i;
+  uint8_t i;
   for (i = 0; i < 100; i++) drawPixel(i, i, WHITE);
 }
 /*******************************************************/
-void C_D_LCD::drawCircle(uint16 x0, uint16 y0, uint16 r, uint32 color)
+void C_D_LCD::drawCircle(int16_t x0, int16_t y0, int16_t r, uint32_t color)
 {
-  uint16 f = 1 - r;
-  uint16 ddF_x = 1;
-  uint16 ddF_y = -2 * r;
-  uint16 x = 0;
-  uint16 y = r;
+  int16_t f = 1 - r;
+  int16_t ddF_x = 1;
+  int16_t ddF_y = -2 * r;
+  int16_t x = 0;
+  int16_t y = r;
 
-  drawPixel(x0  , y0+r, color);
-  drawPixel(x0  , y0-r, color);
-  drawPixel(x0+r, y0  , color);
-  drawPixel(x0-r, y0  , color);
+  //center
+  drawPixel(x0    , y0 + r, color);
+  drawPixel(x0    , y0 - r, color);
+  drawPixel(x0 + r, y0    , color);
+  drawPixel(x0 - r, y0    , color);
 
   while (x<y) {
     if (f >= 0) {
@@ -443,7 +444,7 @@ void C_D_LCD::drawCircle(uint16 x0, uint16 y0, uint16 r, uint32 color)
     x++;
     ddF_x += 2;
     f += ddF_x;
-  
+	
     drawPixel(x0 + x, y0 + y, color);
     drawPixel(x0 - x, y0 + y, color);
     drawPixel(x0 + x, y0 - y, color);
@@ -455,13 +456,13 @@ void C_D_LCD::drawCircle(uint16 x0, uint16 y0, uint16 r, uint32 color)
   }
 }
 /*******************************************************/
-void C_D_LCD::drawCircleHelper( uint16 x0, uint16 y0, uint16 r, uint8 cornername, uint32 color)
+void C_D_LCD::drawCircleHelper( int16_t x0, int16_t y0, int16_t r, uint8_t cornername, uint32_t color)
 {
-  uint16 f     = 1 - r;
-  uint16 ddF_x = 1;
-  uint16 ddF_y = -2 * r;
-  uint16 x     = 0;
-  uint16 y     = r;
+  int16_t f     = 1 - r;
+  int16_t ddF_x = 1;
+  int16_t ddF_y = -2 * r;
+  int16_t x     = 0;
+  int16_t y     = r;
 
   while (x<y) {
     if (f >= 0) {
@@ -493,13 +494,13 @@ void C_D_LCD::drawCircleHelper( uint16 x0, uint16 y0, uint16 r, uint8 cornername
 /*******************************************************/
 
 /* Used to do circles and roundrects. */
-void C_D_LCD::fillCircleHelper(uint16 x0, uint16 y0, uint16 r, uint8 cornername, uint16 delta, uint32 color)
+void C_D_LCD::fillCircleHelper(int16_t x0, int16_t y0, int16_t r, uint8_t cornername, int16_t delta, uint32_t color)
 {
-  uint16 f     = 1 - r;
-  uint16 ddF_x = 1;
-  uint16 ddF_y = -2 * r;
-  uint16 x     = 0;
-  uint16 y     = r;
+  int16_t f     = 1 - r;
+  int16_t ddF_x = 1;
+  int16_t ddF_y = -2 * r;
+  int16_t x     = 0;
+  int16_t y     = r;
 
   while (x<y) {
     if (f >= 0) {
@@ -522,7 +523,7 @@ void C_D_LCD::fillCircleHelper(uint16 x0, uint16 y0, uint16 r, uint8 cornername,
   }
 }
 /*******************************************************/
-void C_D_LCD::fillCircle(uint16 x0, uint16 y0, uint16 r, uint32 color)
+void C_D_LCD::fillCircle(int16_t x0, int16_t y0, int16_t r, uint32_t color)
 {
   drawFastVLine(x0, y0-r, 2*r+1, color);
   fillCircleHelper(x0, y0, r, 3, 0, color);
@@ -530,7 +531,7 @@ void C_D_LCD::fillCircle(uint16 x0, uint16 y0, uint16 r, uint32 color)
 /*******************************************************/
 
 /* Fill a rounded rectangle. */
-void C_D_LCD::fillRoundRect(uint16 x, uint16 y, uint16 w, uint16 h, uint16 r, uint32 color)
+void C_D_LCD::fillRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint32_t color)
 {
   // smarter version
   fillRect(x+r, y, w-2*r, h, color);
@@ -540,14 +541,14 @@ void C_D_LCD::fillRoundRect(uint16 x, uint16 y, uint16 w, uint16 h, uint16 r, ui
   fillCircleHelper(x+r    , y+r, r, 2, h-2*r-1, color);
 }
 /*******************************************************/
-char* C_D_LCD::toChar(uint8 d)
+char* C_D_LCD::toChar(uint8_t d)
 {
     character = (char)(d+48);
     if(d < 10) return &character;
     return 0;
 }
 /*******************************************************/
-void C_D_LCD::drawChar(uint16 x, uint16 y, unsigned char c, uint32 color, uint16 bg, uint8 size)
+void C_D_LCD::drawChar(int16_t x, int16_t y, unsigned char c, uint32_t color, uint16_t bg, uint8_t size)
 {
   if((x >= _width)            || // Clip right
     (y  >= _height)           || // Clip bottom
@@ -558,7 +559,7 @@ void C_D_LCD::drawChar(uint16 x, uint16 y, unsigned char c, uint32 color, uint16
   int8 i;
 
   for (i = 0; i < 6; i++ ) {
-    uint8 line;
+    uint8_t line;
     if (i == 5) 
       line = 0x0;
     else 
@@ -583,9 +584,9 @@ void C_D_LCD::drawChar(uint16 x, uint16 y, unsigned char c, uint32 color, uint16
   }
 }
 /*******************************************************/
-void C_D_LCD::print(char* text, uint32 color, uint16 bg, uint8 size)
+void C_D_LCD::print(char* text, uint32_t color, uint16_t bg, uint8_t size)
 {
-    uint8 i, j, nChar;
+    uint8_t i, j, nChar;
     i = j = 0;
     nChar = ' ';
     
@@ -621,14 +622,14 @@ void C_D_LCD::print(char* text, uint32 color, uint16 bg, uint8 size)
     y_start = 0;
 }
 /*******************************************************/
-void C_D_LCD::printN(char* textTwo, uint32 color, uint16 bg, uint8 size, uint8 num)
+void C_D_LCD::printN(char* textTwo, uint32_t color, uint16_t bg, uint8_t size, uint8_t num)
 {
     char tempNum[1];
     char tempText[strlen(textTwo)];
     
-    uint8 c = num/100;
-    uint8 d = num/10 - c*10;
-    uint8 u = num - c*100 - d*10;
+    uint8_t c = num/100;
+    uint8_t d = num/10 - c*10;
+    uint8_t u = num - c*100 - d*10;
 
     if ((num >= 100)&&(num <= 255))
     {
