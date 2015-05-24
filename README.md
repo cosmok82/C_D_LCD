@@ -17,3 +17,17 @@ Topic on <a href="http://goo.gl/Y1xJHQ">esp8266.com</a> .
     -   Implemented as Class
     Fix:
     -   All problems of compilation solved as "external C"
+    
+    1.0.0 (2015-05-24)
+    ------------------
+    New:
+    -   First working version of TFTM1802 SPI Display porting library to ESP8266
+        (with 160Mhz overclock feature)
+    -   Works pretty well at 40Mhz! (at 80Mhz or 160Mhz)
+    Changes:
+    -   Works with last SPI driver implemented into Arduino 1.6.4 IDE for ESP8266
+    Fix:
+    -   All problems solved
+    -   Lots bug fix :)
+    
+
