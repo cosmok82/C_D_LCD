@@ -31,11 +31,13 @@
 #define _C_D_LCD_H_INCLUDED
 
 #include <Arduino.h>
+#include <Print.h>
 #include <SPI.h>
 extern "C" {  //used "external C" to solve all compiling problems
 #include "glcdfont.h"
 #include "gpio.h"
 }
+
 
 #ifndef NULL
 #define NULL ((void *)0)
@@ -139,27 +141,35 @@ extern "C" {  //used "external C" to solve all compiling problems
 ////////////////////////////////////////////////////////////////////////////////
 #define swap(a, b) { uint16_t t = a; a = b; b = t; }
 
-class C_D_LCD { //only for ARDUINO ESP8266
+////////////////////////////////////////////////////////////////////////////////
+//
+// RS & RST Definitions
+//				 
+////////////////////////////////////////////////////////////////////////////////
+#define TFT_RS_init()        pinMode(2, OUTPUT)
+#define RS_Write(bit_value)  digitalWrite(2, bit_value)
+#define TFT_RST_init()       pinMode(16, OUTPUT)
+#define RST_Write(bit_value) digitalWrite(16, bit_value)
+
+class C_D_LCD : public Print { //only for ARDUINO ESP8266
 public:
-	  
+
   // Initialize the C_D_LCD library
   void begin(void),
 	   end(void);
-	  	  
-  uint8_t x_start, y_start;
   
-  void LCDCommand(uint8_t datacmd),
-	   LCDData(uint8_t datadt),
-	  
-	   initDISPLAY(void),
-
+  // This MUST be defined in this subclass:
+  virtual size_t write(uint8_t);
+  
+  void initDISPLAY(void),
+  
 	   setAddrWindow(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1),
 	   fillColor(uint32_t color),
 	   drawPixel(uint16_t x, uint16_t y, uint32_t color),
 	   drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint32_t color),
 	   setWidth(uint8_t d),
 	   setHeight(uint8_t d),
-	   RotSetting(uint8_t m),
+	   setRotation(uint8_t m),
 	   drawFastVLine(int16_t x, int16_t y, int16_t h, uint32_t color),
 	   drawFastHLine(int16_t x, int16_t y, int16_t w, uint32_t color),
 	   drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint32_t color),
@@ -171,30 +181,36 @@ public:
 	   fillCircleHelper(int16_t x0, int16_t y0, int16_t r, uint8_t cornername, int16_t delta, uint32_t color),
 	   fillCircle(int16_t x0, int16_t y0, int16_t r, uint32_t color),
 	   fillRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint32_t color),
-	   drawChar(int16_t x, int16_t y, unsigned char c, uint32_t color, uint16_t bg, uint8_t size),
-	   print(char* text, uint32_t color, uint16_t bg, uint8_t size),
-	   printN(char* text, uint32_t color, uint16_t bg, uint8_t size, uint8_t num);
+	   drawChar(int16_t x, int16_t y, unsigned char c, uint32_t color, uint32_t bg, uint8_t size),
+	   setCursor(int8_t x, int8_t y),
+	   setTextSize(uint8_t s),
+	   setTextColor(uint32_t c),
+	   setTextColor(uint32_t c, uint32_t b),
+	   setTextWrap(boolean w);
 	
- char* toChar(uint8_t d);
- uint8_t getWidth(void),
-	     getHeight(void);
+ uint8_t getWidth(void) const,
+	     getHeight(void) const,
+		 getRotation(void) const;
 	  
 private:
 	
   void initSPIM(void),
-	   ResetDispaly(void);
-	
-	   #define TFT_RS_init()        pinMode(2, OUTPUT)
-       #define RS_Write(bit_value)  digitalWrite(2, bit_value)
-	   #define TFT_RST_init()       pinMode(16, OUTPUT)
-       #define RST_Write(bit_value) digitalWrite(16, bit_value)	
-  uint8_t _width,
-	      _height;
-  char character = ' ';
-	  
+	   ResetDispaly(void),
+	   LCDCommand(uint8_t datacmd),
+	   LCDData(uint8_t datadt);
+ uint8_t x_start, y_start;
+
+protected:
+
+  uint8_t  _width, _height,   // Display w/h as modified by current rotation
+		   cursor_x, cursor_y,
+		   textsize,
+		   rotation;
+  uint32_t textcolor,
+		   textbgcolor;
+  boolean  wrap;              // If set, 'wrap' text at right edge of display (on width & height side)
+
 };
 
-
-extern C_D_LCD SPILCD;
 
 #endif // _C_D_LCD_H_INCLUDED

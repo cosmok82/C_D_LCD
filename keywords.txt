@@ -7,7 +7,6 @@
 #######################################
 
 C_D_LCD				KEYWORD1
-LCD					KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
@@ -25,7 +24,7 @@ setWidth			KEYWORD2
 setHeight			KEYWORD2
 getWidth			KEYWORD2
 getHeight			KEYWORD2
-RotSetting			KEYWORD2
+setRotation			KEYWORD2
 drawFastVLine		KEYWORD2
 drawFastHLine		KEYWORD2
 drawRect			KEYWORD2
@@ -37,13 +36,14 @@ drawCircleHelper	KEYWORD2
 fillCircleHelper	KEYWORD2
 fillCircle			KEYWORD2
 fillRoundRect		KEYWORD2
-toChar				KEYWORD2
 drawChar			KEYWORD2
-print				KEYWORD2
-printN				KEYWORD2
+setCursor			KEYWORD2
+setTextSize			KEYWORD2
+setTextColor		KEYWORD2
+setTextColor		KEYWORD2
+setTextWrap			KEYWORD2
+getRotation			KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
 #######################################
-x_start				LITERAL1
-y_start				LITERAL1

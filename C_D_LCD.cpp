@@ -28,16 +28,6 @@
 */
 
 #include "C_D_LCD.h"
-#include <SPI.h>
-#include <stdlib.h>
-#include <math.h>
-extern "C" {
-	#include "c_types.h"
-	#include "osapi.h"
-}
-
-C_D_LCD SPILCD;
-
 
 
 /* This function transmits a command to the LCD driver */
@@ -45,18 +35,17 @@ void C_D_LCD::LCDCommand(uint8_t datacmd)
 {
 	RS_Write(LOW);
 	SPI.write(datacmd);
-	//SPI.spi_tx8(datacmd);
 }
 /*******************************************************/
+
 /* This function transmits a data to the LCD driver */
 void C_D_LCD::LCDData(uint8_t datadt)
 {
 	RS_Write(HIGH);
 	SPI.write(datadt);
-	//SPI.spi_tx8(datadt);
 }
-
 /*******************************************************/
+
 void C_D_LCD::ResetDispaly(void)
 {
 	RST_Write(HIGH);
@@ -67,6 +56,7 @@ void C_D_LCD::ResetDispaly(void)
 	delay(10);
 }
 /*******************************************************/
+
 void C_D_LCD::initSPIM(void)
 {
 	TFT_RS_init();
@@ -78,11 +68,16 @@ void C_D_LCD::initSPIM(void)
 	SPI.setBitOrder(MSBFIRST);
 	delay(100);
 };
-
 /*******************************************************/
+
 void C_D_LCD::initDISPLAY(void)
 {
-    x_start = y_start = 0u;                         // May be overridden in begin function.
+    x_start   = y_start = 0u;                       // May be overridden in begin function.
+	rotation  = 0u;
+	textsize  = 1u;
+	wrap      = true;
+	textcolor = textbgcolor = WHITE;
+	
     initSPIM();
 	ResetDispaly();
 	
@@ -220,13 +215,14 @@ void C_D_LCD::initDISPLAY(void)
     _width  = WIDTH;
     _height = HEIGHT;
 }
+/*******************************************************/
 
 void C_D_LCD::begin(void)
 {
 	initDISPLAY();
 }
-
 /*******************************************************/
+
 void C_D_LCD::setAddrWindow(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1)
 {
   LCDCommand(CASET);      // column addr set
@@ -302,7 +298,7 @@ void C_D_LCD::drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint32_t 
 /*******************************************************/
 void C_D_LCD::setWidth(uint8_t d)
 {
-    if (d == 0) // if (d == NULL)
+    if (d == NULL)
         _width = WIDTH;
     else
         _width = d;
@@ -310,18 +306,18 @@ void C_D_LCD::setWidth(uint8_t d)
 /*******************************************************/
 void C_D_LCD::setHeight(uint8_t d)
 {
-    if (d == 0) // if (d == NULL)
+    if (d == NULL)
         _height = HEIGHT;
     else
         _height = d;
 }
 /*******************************************************/
-uint8_t C_D_LCD::getWidth(void)
+uint8_t C_D_LCD::getWidth(void) const
 {
     return _width;
 }
 /*******************************************************/
-uint8_t C_D_LCD::getHeight(void)
+uint8_t C_D_LCD::getHeight(void) const
 {
     return _height;
 }
@@ -337,10 +333,10 @@ uint8_t C_D_LCD::getHeight(void)
 #define MADCTL_MH  0x04
 
 /* Set Display rotation. */
-void C_D_LCD::RotSetting(uint8_t m)
+void C_D_LCD::setRotation(uint8_t m)
 {
   LCDCommand(MADCTL);
-  uint8_t rotation = m % 4; // can't be higher than 3
+  rotation = m % 4; // can't be higher than 3
   switch (rotation)
   { 
     case 0: // portrait 0°
@@ -541,17 +537,10 @@ void C_D_LCD::fillRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t 
   fillCircleHelper(x+r    , y+r, r, 2, h-2*r-1, color);
 }
 /*******************************************************/
-char* C_D_LCD::toChar(uint8_t d)
-{
-    character = (char)(d+48);
-    if(d < 10) return &character;
-    return 0;
-}
-/*******************************************************/
-void C_D_LCD::drawChar(int16_t x, int16_t y, unsigned char c, uint32_t color, uint16_t bg, uint8_t size)
+void C_D_LCD::drawChar(int16_t x, int16_t y, unsigned char c, uint32_t color, uint32_t bg, uint8_t size)
 {
   if((x >= _width)            || // Clip right
-    (y  >= _height)           || // Clip bottom
+    ( y >= _height)           || // Clip bottom
     ((x + 6 * size - 1) < 0)  || // Clip left
     ((y + 8 * size - 1) < 0))    // Clip top
     return;
@@ -584,69 +573,52 @@ void C_D_LCD::drawChar(int16_t x, int16_t y, unsigned char c, uint32_t color, ui
   }
 }
 /*******************************************************/
-void C_D_LCD::print(char* text, uint32_t color, uint16_t bg, uint8_t size)
-{
-    uint8_t i, j, nChar;
-    i = j = 0;
-    nChar = ' ';
-    
-    for(j = 0; j < strlen(text); j++)
-    {
-        if (text[j] == '\n')
-        {
-            j++;
-            i = x_start = 0;    // x reset
-            y_start += size*8;  // new line
-        }
-        else if (text[j] == '\r')
-        {
-            // skip em
-        }
-        
-        if (_height == HEIGHT)
-            nChar = 21;
-        else if (_height == WIDTH)
-            nChar = 26;
-        
-        if (i == nChar)
-        {
-            i = x_start = 0;
-            y_start += size*8; // new line
-        }
-        
-        x_start = i+5*i*size;
-        drawChar(0, 0, text[j], color, bg, size);    
-        i++;
-    }
-    x_start = 0;
-    y_start = 0;
+void C_D_LCD::setCursor(int8_t x, int8_t y) {
+  cursor_x = x;
+  cursor_y = y;
 }
 /*******************************************************/
-void C_D_LCD::printN(char* textTwo, uint32_t color, uint16_t bg, uint8_t size, uint8_t num)
-{
-    char tempNum[1];
-    char tempText[strlen(textTwo)];
-    
-    uint8_t c = num/100;
-    uint8_t d = num/10 - c*10;
-    uint8_t u = num - c*100 - d*10;
-
-    if ((num >= 100)&&(num <= 255))
-    {
-        strncat(tempNum, toChar(c), 1);
-        strncat(tempNum, toChar(d), 1);
-        strncat(tempNum, toChar(u), 1);
+void C_D_LCD::setTextSize(uint8_t s) {
+  textsize = (s > 0) ? s : 1;
+}
+/*******************************************************/
+void C_D_LCD::setTextColor(uint32_t c) {
+  // For 'transparent' background, we'll set the bg 
+  // to the same as fg instead of using a flag
+  textcolor = textbgcolor = c;
+}
+/*******************************************************/
+void C_D_LCD::setTextColor(uint32_t c, uint32_t b) {
+  textcolor   = c;
+  textbgcolor = b; 
+}
+/*******************************************************/
+void C_D_LCD::setTextWrap(boolean w) {
+  wrap = w;
+}
+/*******************************************************/
+uint8_t C_D_LCD::getRotation(void) const {
+  return rotation;
+}
+/*******************************************************/
+size_t C_D_LCD::write(uint8_t c) {
+  if (c == '\n') {
+    cursor_y += textsize*8;
+    cursor_x  = 0;
+  } else if (c == '\r') {
+    // skip em
+  } else {
+    drawChar(cursor_x, cursor_y, c, textcolor, textbgcolor, textsize);
+    cursor_x += textsize*6;
+    if (wrap && (cursor_x > (_width - textsize*6))) {
+      cursor_y += textsize*8;
+      cursor_x = 0;
     }
-    else if ((num >= 10)&&(num < 100))
-    {
-        strncat(tempNum, toChar(d), 1);
-        strncat(tempNum, toChar(u), 1);
+	if (wrap && (cursor_y > (_height - textsize*6))) {
+      cursor_y = 0;
+      cursor_x = 0;
     }
-    else
-    strncat(tempNum, toChar(u), 1);
-
-    strcpy(tempText, textTwo);
-    
-    strncat(tempText, tempNum, strlen(tempNum));
-    print(tempText, color, bg, size);
+  }
+  
+  return 1;
 }
