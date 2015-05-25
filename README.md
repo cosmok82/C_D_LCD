@@ -30,4 +30,15 @@ Topic on <a href="http://goo.gl/Y1xJHQ">esp8266.com</a> .
     -   All problems solved
     -   Lots bug fix :)
     
+    1.1.0 (2015-05-25)
+    ------------------
+    New:
+    -   Added many methods to improve text writing
+    -   Right now, the C_D_LCD Class is an extension of Print Class
+    -   Improved the text writing
+    Changes:
+    -   C_D_LCD Class is an extension of Print Class, all data formats are now supported!
+    Fix:
+    -   Some bug fix
+    
 
