@@ -72,7 +72,7 @@ void C_D_LCD::initSPIM(void)
 
 void C_D_LCD::initDISPLAY(void)
 {
-    x_start   = y_start = 0u;                       // May be overridden in begin function.
+    x_start   = y_start = 0u;                       /* May be overridden in begin function. */
 	rotation  = 0u;
 	textsize  = 1u;
 	wrap      = true;
@@ -82,57 +82,57 @@ void C_D_LCD::initDISPLAY(void)
 	ResetDispaly();
 	
     LCDCommand(0xF0);
-    LCDData(0x5A); LCDData(0x5A);                   // Excommand2.
+    LCDData(0x5A); LCDData(0x5A);                   /* Excommand2. */
 	
     LCDCommand(0xFC);
-    LCDData(0x5A); LCDData(0x5A);                   // Excommand3.
+    LCDData(0x5A); LCDData(0x5A);                   /* Excommand3. */
 	
     LCDCommand(0x26);
-    LCDData(0x01);                                  // Gamma set.
+    LCDData(0x01);                                  /* Gamma set. */
 	
     LCDCommand(0xFA);
     LCDData(0x02); LCDData(0x1F); LCDData(0x00);
     LCDData(0x10); LCDData(0x22); LCDData(0x30);
     LCDData(0x38); LCDData(0x3A); LCDData(0x3A);
     LCDData(0x3A); LCDData(0x3A); LCDData(0x3A);
-    LCDData(0x3D); LCDData(0x02); LCDData(0x01);	// Positive gamma control.
+    LCDData(0x3D); LCDData(0x02); LCDData(0x01);	/* Positive gamma control. */
 	
     LCDCommand(0xFB);
     LCDData(0x21); LCDData(0x00); LCDData(0x02);
     LCDData(0x04); LCDData(0x07); LCDData(0x0A);
     LCDData(0x0B); LCDData(0x0C); LCDData(0x0C);
     LCDData(0x16); LCDData(0x1E); LCDData(0x30);
-    LCDData(0x3F); LCDData(0x01); LCDData(0x02);	// Negative gamma control.
+    LCDData(0x3F); LCDData(0x01); LCDData(0x02);	/* Negative gamma control. */
 	
-    //////////////power setting sequence//////////
+    /*********** power setting sequence **********/
     
     LCDCommand(0xFD);
     LCDData(0x00); LCDData(0x00); LCDData(0x00);
     LCDData(0x17); LCDData(0x10); LCDData(0x00);
     LCDData(0x01); LCDData(0x01); LCDData(0x00);
-    LCDData(0x1F); LCDData(0x1F);                   // Analog parameter control.
+    LCDData(0x1F); LCDData(0x1F);                   /* Analog parameter control. */
 	
     LCDCommand(0xF4);
     LCDData(0x00); LCDData(0x00); LCDData(0x00);
     LCDData(0x00); LCDData(0x00); LCDData(0x3F);
     LCDData(0x3F); LCDData(0x07); LCDData(0x00);
     LCDData(0x3C); LCDData(0x36); LCDData(0x00);
-    LCDData(0x3C); LCDData(0x36); LCDData(0x00);	// Power control.
+    LCDData(0x3C); LCDData(0x36); LCDData(0x00);	/* Power control. */
 	
     LCDCommand(0xF5);
     LCDData(0x00); LCDData(0x70); LCDData(0x66);
     LCDData(0x00); LCDData(0x00); LCDData(0x00);
     LCDData(0x00); LCDData(0x00); LCDData(0x00);
     LCDData(0x00); LCDData(0x6D); LCDData(0x66);
-    LCDData(0x06);                                  // VCOM control.
+    LCDData(0x06);                                  /* VCOM control. */
 	
     LCDCommand(0xF6);
     LCDData(0x02); LCDData(0x00); LCDData(0x3F);
     LCDData(0x00); LCDData(0x00); LCDData(0x00);
     LCDData(0x02); LCDData(0x00); LCDData(0x06);
-    LCDData(0x01); LCDData(0x00);                   // Source control.
+    LCDData(0x01); LCDData(0x00);                   /* Source control. */
 	
-    /////////////initializing sequence/////////////
+    /*********** initializing sequence ***********/
     
     LCDCommand(0xF2);
     LCDData(0x00); LCDData(0x01); /*04*/ LCDData(0x03);
@@ -140,37 +140,37 @@ void C_D_LCD::initDISPLAY(void)
     LCDData(0x00); LCDData(0x00); LCDData(0x00);
     LCDData(0x00); LCDData(0x00); LCDData(0x01);
     LCDData(0x00); LCDData(0x00); LCDData(0x04);
-    LCDData(0x08); LCDData(0x08);                   // Display control.
+    LCDData(0x08); LCDData(0x08);                   /* Display control. */
 	
     LCDCommand(0xF8);
-    LCDData(0x11);                                  // Gate control.
+    LCDData(0x11);                                  /* Gate control. */
 	
     LCDCommand(0xF7);
     LCDData(0xC8); LCDData(0x20); LCDData(0x00);
-    LCDData(0x00);	                                // Interface control.
+    LCDData(0x00);	                                /* Interface control. */
     
     LCDCommand(0xF3);
     LCDData(0x00);
-    LCDData(0x00);	                                // Power sequence control.
+    LCDData(0x00);	                                /* Power sequence control. */
 	
     LCDCommand(SLEEPOUT);
-    delay(50);                                      // Wake.
+    delay(50);                                      /* Wake. */
 	
     LCDCommand(0xF3);
     LCDData(0x00); LCDData(0x01);
-    delay(50);	                                	// Power sequence control.
+    delay(50);	                                	/* Power sequence control. */
 	
     LCDCommand(0xF3);
     LCDData(0x00); LCDData(0x03);
-    delay(50);	                                	// Power sequence control.
+    delay(50);	                                	/* Power sequence control. */
 	
     LCDCommand(0xF3);
     LCDData(0x00); LCDData(0x07);
-    delay(50);	                                	// Power sequence control.
+    delay(50);	                                	/* Power sequence control. */
 	
     LCDCommand(0xF3);
     LCDData(0x00); LCDData(0x0F);
-    delay(50);	                                	// Power sequence control.
+    delay(50);	                                	/* Power sequence control. */
 	
     LCDCommand(0xF4);
     LCDData(0x00); LCDData(0x04); LCDData(0x00);
@@ -178,39 +178,39 @@ void C_D_LCD::initDISPLAY(void)
     LCDData(0x3F); LCDData(0x07); LCDData(0x00);
     LCDData(0x3C); LCDData(0x36); LCDData(0x00);
     LCDData(0x3C); LCDData(0x36); LCDData(0x00);
-    delay(50);	                                	// Power control.
+    delay(50);	                                	/* Power control. */
 	
     LCDCommand(0xF3);
     LCDData(0x00); LCDData(0x1F);
-    delay(50);	                                	// Power sequence control.
+    delay(50);	                                	/* Power sequence control. */
 	
     LCDCommand(0xF3);
     LCDData(0x00); LCDData(0x7F);
-    delay(50);	                                	// Power sequence control.
+    delay(50);	                                	/* Power sequence control. */
 	
     LCDCommand(0xF3);
     LCDData(0x00); LCDData(0xFF);
-    delay(50);	                                	// Power sequence control.
+    delay(50);	                                	/* Power sequence control. */
     
     LCDCommand(0xFD);
     LCDData(0x00); LCDData(0x00); LCDData(0x00);
     LCDData(0x17); LCDData(0x10); LCDData(0x00);
     LCDData(0x00); LCDData(0x01); LCDData(0x00);
-    LCDData(0x16); LCDData(0x16);                   // Analog parameter control.
+    LCDData(0x16); LCDData(0x16);                   /* Analog parameter control. */
 
     LCDCommand(0xF4);
     LCDData(0x00); LCDData(0x09); LCDData(0x00);
     LCDData(0x00); LCDData(0x00); LCDData(0x3F);
     LCDData(0x3F); LCDData(0x07); LCDData(0x00);
     LCDData(0x3C); LCDData(0x36); LCDData(0x00);
-    LCDData(0x3C); LCDData(0x36); LCDData(0x00);    // Power control.
+    LCDData(0x3C); LCDData(0x36); LCDData(0x00);    /* Power control. */
 
-    LCDCommand(MADCTL);                             // Memory access data control.
+    LCDCommand(MADCTL);                             /* Memory access data control. */
     LCDData(0x08);    
-    LCDCommand(0x35);                               // Tearing effect line on.
+    LCDCommand(0x35);                               /* Tearing effect line on. */
     LCDData(NOP);
-	LCDCommand(DISPON);                             // Display on.
-    LCDCommand(RAMWR);                              // Memory write.
+	LCDCommand(DISPON);                             /* Display on. */
+    LCDCommand(RAMWR);                              /* Memory write. */
     
     _width  = WIDTH;
     _height = HEIGHT;
@@ -225,18 +225,18 @@ void C_D_LCD::begin(void)
 
 void C_D_LCD::setAddrWindow(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1)
 {
-  LCDCommand(CASET);      // column addr set
+  LCDCommand(CASET);      /* column addr set */
   LCDData(NOP);  
-  LCDData(x0+x_start);    // XSTART
+  LCDData(x0+x_start);    /* XSTART          */
   LCDData(NOP);
-  LCDData(x1+x_start);    // XEND
-  LCDCommand(RASET);      // row addr set
+  LCDData(x1+x_start);    /* XEND            */
+  LCDCommand(RASET);      /* row addr set    */
   LCDData(NOP);
-  LCDData(y0+y_start);    // YSTART
+  LCDData(y0+y_start);    /* YSTART          */
   LCDData(NOP);
-  LCDData(y1+y_start);    // YEND
+  LCDData(y1+y_start);    /* YEND            */
 
-  LCDCommand(RAMWR);      // write to RAM
+  LCDCommand(RAMWR);      /* write to RAM    */
 }
 /*******************************************************/
 void C_D_LCD::fillColor(uint32_t color)
@@ -336,28 +336,28 @@ uint8_t C_D_LCD::getHeight(void) const
 void C_D_LCD::setRotation(uint8_t m)
 {
   LCDCommand(MADCTL);
-  rotation = m % 4; // can't be higher than 3
+  rotation = m % 4; /* can't be higher than 3 */
   switch (rotation)
   { 
-    case 0: // portrait 0°
+    case 0: 		/* portrait 0°            */
     LCDData(MADCTL_BGR);
     _width  = WIDTH;
     _height = HEIGHT;
     break;
     
-    case 1: // landscape 90°
+    case 1: 		/* landscape 90°  		  */
     LCDData(MADCTL_MX | MADCTL_MV | MADCTL_BGR);
     _width  = HEIGHT;
     _height = WIDTH;
     break;
     
-    case 2: // portrait 180°
+    case 2: 		/* portrait 180°		  */
     LCDData(MADCTL_MX | MADCTL_MY | MADCTL_BGR);
     _width  = WIDTH;
     _height = HEIGHT;
     break;
     
-    case 3: // landscape 270°
+    case 3: 		/* landscape 270°		  */
     LCDData(MADCTL_MY | MADCTL_MV | MADCTL_BGR);
     _width  = HEIGHT;
     _height = WIDTH;
@@ -367,7 +367,7 @@ void C_D_LCD::setRotation(uint8_t m)
 /*******************************************************/
 void C_D_LCD::drawFastVLine(int16_t x, int16_t y, int16_t h, uint32_t color)
 {  
-  // Rudimentary clipping
+  /* Rudimentary clipping */
   if((x < 0) || (x >= _width) || (y < 0) || (y >= _height)) return;
   if((y+h-1) >= _height)  h = _height-y;
   
@@ -380,7 +380,7 @@ void C_D_LCD::drawFastVLine(int16_t x, int16_t y, int16_t h, uint32_t color)
 /*******************************************************/
 void C_D_LCD::drawFastHLine(int16_t x, int16_t y, int16_t w, uint32_t color)
 {
-  // Rudimentary clipping
+  /* Rudimentary clipping */
   if((x < 0) || (x >= _width) || (y < 0) || (y >= _height)) return;
   if((x+w-1) >= _width)  w = _width-x;
   setAddrWindow(x, y, x+w-1, y);
@@ -425,7 +425,7 @@ void C_D_LCD::drawCircle(int16_t x0, int16_t y0, int16_t r, uint32_t color)
   int16_t x = 0;
   int16_t y = r;
 
-  //center
+  /* center */
   drawPixel(x0    , y0 + r, color);
   drawPixel(x0    , y0 - r, color);
   drawPixel(x0 + r, y0    , color);
@@ -529,20 +529,20 @@ void C_D_LCD::fillCircle(int16_t x0, int16_t y0, int16_t r, uint32_t color)
 /* Fill a rounded rectangle. */
 void C_D_LCD::fillRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint32_t color)
 {
-  // smarter version
+  /* smarter version   */
   fillRect(x+r, y, w-2*r, h, color);
 
-  // draw four corners
+  /* draw four corners */
   fillCircleHelper(x+w-r-1, y+r, r, 1, h-2*r-1, color);
   fillCircleHelper(x+r    , y+r, r, 2, h-2*r-1, color);
 }
 /*******************************************************/
 void C_D_LCD::drawChar(int16_t x, int16_t y, unsigned char c, uint32_t color, uint32_t bg, uint8_t size)
 {
-  if((x >= _width)            || // Clip right
-    ( y >= _height)           || // Clip bottom
-    ((x + 6 * size - 1) < 0)  || // Clip left
-    ((y + 8 * size - 1) < 0))    // Clip top
+  if((x >= _width)            || /* Clip right  */
+    ( y >= _height)           || /* Clip bottom */
+    ((x + 6 * size - 1) < 0)  || /* Clip left   */
+    ((y + 8 * size - 1) < 0))    /* Clip top    */
     return;
 
   int8 i;
@@ -556,15 +556,15 @@ void C_D_LCD::drawChar(int16_t x, int16_t y, unsigned char c, uint32_t color, ui
     int8 j;
     for (j = 0; j < 8; j++) {
       if (line & 0x1) {
-        if (size == 1)          // default size
+        if (size == 1)          /* default size */
           drawPixel(x+i, y+j, color);
-        else {                  // big size
+        else {                  /* big size     */
           fillRect(x+(i*size), y+(j*size), size, size, color);
         } 
       } else if (bg != color) {
-        if (size == 1)          // default size
+        if (size == 1)          /* default size */
           drawPixel(x+i, y+j, bg);
-        else {                  // big size
+        else {                  /* big size     */
           fillRect(x+i*size, y+j*size, size, size, bg);
         }
       }
@@ -583,8 +583,10 @@ void C_D_LCD::setTextSize(uint8_t s) {
 }
 /*******************************************************/
 void C_D_LCD::setTextColor(uint32_t c) {
-  // For 'transparent' background, we'll set the bg 
-  // to the same as fg instead of using a flag
+  /*
+   * For 'transparent' background, we'll set the bg 
+   * to the same as fg instead of using a flag.
+   */
   textcolor = textbgcolor = c;
 }
 /*******************************************************/
@@ -606,7 +608,7 @@ size_t C_D_LCD::write(uint8_t c) {
     cursor_y += textsize*8;
     cursor_x  = 0;
   } else if (c == '\r') {
-    // skip em
+    /* skip em */
   } else {
     drawChar(cursor_x, cursor_y, c, textcolor, textbgcolor, textsize);
     cursor_x += textsize*6;
